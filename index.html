@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Year Countdown</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f6f6f6;
+    --border: #e8e8e8;
+    --text: #1f1f1f;
+    --muted: #8a8a8a;
+    --accent: #1f1f1f;
+    --track: #ececec;
+    --shadow: 0 1px 2px rgba(0,0,0,.05);
+    --radius: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg: #2b2b2d;
+    --surface: #343437;
+    --border: #404044;
+    --text: #ececec;
+    --muted: #9a9a9f;
+    --accent: #ececec;
+    --track: #3d3d41;
+    --shadow: 0 1px 2px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--font); transition: background .25s, color .25s; }
+  body { padding: 20px; min-height: 100vh; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .title { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .actions { display: flex; gap: 8px; }
+  button { font-family: inherit; cursor: pointer; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; box-shadow: var(--shadow); transition: background .15s, border-color .15s; }
+  button:hover { border-color: var(--muted); }
+  button.icon { width: 34px; height: 32px; padding: 0; display: grid; place-items: center; font-size: 15px; }
+
+  .hero { text-align: center; padding: 28px 0 8px; }
+  .big { font-size: clamp(110px, 30vw, 280px); line-height: .95; font-weight: 800; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+  .label { margin-top: 6px; font-size: clamp(15px, 2.6vw, 22px); color: var(--muted); font-weight: 500; }
+  .hms { margin-top: 14px; font-size: clamp(14px, 2.4vw, 20px); color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .hms b { color: var(--text); font-weight: 600; }
+
+  .progress { margin: 22px auto 0; max-width: 520px; }
+  .bar { height: 6px; border-radius: 99px; background: var(--track); overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .6s ease; }
+  .pct { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+  .events { margin-top: 36px; }
+  .events h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); position: relative; }
+  .card .name { font-size: 14px; font-weight: 600; padding-right: 22px; word-break: break-word; }
+  .card .date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .card .days { font-size: 44px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .card .unit { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card.past .days { color: var(--muted); }
+  .del { position: absolute; top: 8px; right: 8px; border: none; background: transparent; box-shadow: none; color: var(--muted); padding: 2px 6px; font-size: 16px; line-height: 1; }
+  .del:hover { color: var(--text); }
+  .empty { font-size: 13px; color: var(--muted); padding: 18px; border: 1px dashed var(--border); border-radius: var(--radius); text-align: center; }
+
+  #form { display: none; margin-top: 18px; gap: 8px; flex-wrap: wrap; }
+  #form.open { display: flex; }
+  input { font-family: inherit; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; outline: none; }
+  input:focus { border-color: var(--muted); }
+  input[type="text"] { flex: 1 1 180px; min-width: 0; }
+  input[type="date"] { color-scheme: light; }
+  :root[data-theme="dark"] input[type="date"] { color-scheme: dark; }
+  #form button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="title" id="title">Countdown</div>
+    <div class="actions">
+      <button id="addBtn" type="button">+ Event</button>
+      <button id="themeBtn" class="icon" type="button" aria-label="Toggle light and dark mode">☾</button>
+    </div>
+  </div>
+
+  <div id="form">
+    <input type="text" id="evName" placeholder="Event name (e.g. Birthday)" maxlength="40" autocomplete="off">
+    <input type="date" id="evDate">
+    <button class="primary" id="saveBtn" type="button">Add</button>
+  </div>
+
+  <div class="hero">
+    <div class="big" id="days">0</div>
+    <div class="label" id="label">days left</div>
+    <div class="hms" id="hms"></div>
+    <div class="progress">
+      <div class="bar"><i id="fill"></i></div>
+      <div class="pct" id="pct"></div>
+    </div>
+  </div>
+
+  <div class="events">
+    <h2>Special events</h2>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var THEME_KEY = "yc-theme", EVENTS_KEY = "yc-events";
+
+  // ---------- storage helpers ----------
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+  // ---------- theme ----------
+  var params = new URLSearchParams(location.search);
+  var theme = params.get("theme") || load(THEME_KEY, null) ||
+    (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t) {
+    theme = t;
+    root.setAttribute("data-theme", t);
+    themeBtn.textContent = t === "dark" ? "☀" : "☾";
+  }
+  applyTheme(theme);
+  themeBtn.addEventListener("click", function () {
+    applyTheme(theme === "dark" ? "light" : "dark");
+    save(THEME_KEY, theme);
+  });
+
+  // ---------- date helpers ----------
+  function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function parseLocal(str) { var p = str.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function dayDiff(a, b) { return Math.round((startOfDay(a) - startOfDay(b)) / 86400000); }
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  // ---------- year countdown ----------
+  var elDays = document.getElementById("days"),
+      elLabel = document.getElementById("label"),
+      elHms = document.getElementById("hms"),
+      elFill = document.getElementById("fill"),
+      elPct = document.getElementById("pct"),
+      elTitle = document.getElementById("title");
+
+  function tickYear() {
+    var now = new Date();
+    var y = now.getFullYear();
+    var start = new Date(y, 0, 1), end = new Date(y + 1, 0, 1);
+    var left = end - now;
+    var d = Math.floor(left / 86400000);
+    var h = Math.floor(left / 3600000) % 24;
+    var m = Math.floor(left / 60000) % 60;
+    var s = Math.floor(left / 1000) % 60;
+    elTitle.textContent = y + " countdown";
+    elDays.textContent = d;
+    elLabel.textContent = (d === 1 ? "day" : "days") + " left in " + y;
+    elHms.innerHTML = "<b>" + pad(h) + "</b>h &nbsp;<b>" + pad(m) + "</b>m &nbsp;<b>" + pad(s) + "</b>s";
+    var pct = ((now - start) / (end - start)) * 100;
+    elFill.style.width = pct.toFixed(2) + "%";
+    elPct.textContent = pct.toFixed(1) + "% of " + y + " complete";
+  }
+
+  // ---------- events ----------
+  var events = load(EVENTS_KEY, []);
+  var grid = document.getElementById("grid");
+
+  function renderEvents() {
+    grid.innerHTML = "";
+    if (!events.length) {
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "No special events yet. Click “+ Event” to add one.";
+      grid.appendChild(e);
+      return;
+    }
+    var today = new Date();
+    events.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; }).forEach(function (ev) {
+      var diff = dayDiff(parseLocal(ev.date), today);
+      var card = document.createElement("div");
+      card.className = "card" + (diff < 0 ? " past" : "");
+
+      var name = document.createElement("div"); name.className = "name"; name.textContent = ev.name;
+      var date = document.createElement("div"); date.className = "date";
+      date.textContent = parseLocal(ev.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+      var days = document.createElement("div"); days.className = "days";
+      var unit = document.createElement("div"); unit.className = "unit";
+
+      if (diff === 0) { days.textContent = "Today"; days.style.fontSize = "34px"; unit.textContent = "it's happening"; }
+      else if (diff > 0) { days.textContent = diff; unit.textContent = diff === 1 ? "day to go" : "days to go"; }
+      else { days.textContent = Math.abs(diff); unit.textContent = Math.abs(diff) === 1 ? "day ago" : "days ago"; }
+
+      var del = document.createElement("button");
+      del.className = "del"; del.type = "button"; del.title = "Remove"; del.textContent = "×";
+      del.addEventListener("click", function () {
+        events = events.filter(function (x) { return x.id !== ev.id; });
+        save(EVENTS_KEY, events); renderEvents();
+      });
+
+      card.appendChild(del); card.appendChild(name); card.appendChild(date); card.appendChild(days); card.appendChild(unit);
+      grid.appendChild(card);
+    });
+  }
+
+  // ---------- form ----------
+  var form = document.getElementById("form"),
+      addBtn = document.getElementById("addBtn"),
+      evName = document.getElementById("evName"),
+      evDate = document.getElementById("evDate");
+
+  var saveBtn = document.getElementById("saveBtn");
+
+  addBtn.addEventListener("click", function () {
+    form.classList.toggle("open");
+    if (form.classList.contains("open")) evName.focus();
+  });
+
+  function addEvent() {
+    var n = evName.value.trim();
+    if (!n) { evName.focus(); return; }
+    if (!evDate.value) { evDate.focus(); return; }
+    events.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: n, date: evDate.value });
+    save(EVENTS_KEY, events);
+    evName.value = ""; evDate.value = "";
+    form.classList.remove("open");
+    renderEvents();
+  }
+  saveBtn.addEventListener("click", addEvent);
+  [evName, evDate].forEach(function (el) {
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter") addEvent(); });
+  });
+
+  // ---------- run ----------
+  tickYear(); renderEvents();
+  setInterval(tickYear, 1000);
+  setInterval(renderEvents, 60000); // refresh day counts (catches midnight rollover)
+})();
+</script>
+</body>
+</html>
