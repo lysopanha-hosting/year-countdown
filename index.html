@@ -14,7 +14,7 @@
     --accent: #1f1f1f;
     --track: #ececec;
     --shadow: 0 1px 2px rgba(0,0,0,.05);
-    --radius: 12px;
+    --radius: 10px;
     --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   :root[data-theme="dark"] {
@@ -34,37 +34,36 @@
   .wrap { max-width: 880px; margin: 0 auto; }
 
   .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .title { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  .actions { display: flex; gap: 8px; }
+  .actions { display: flex; gap: 8px; align-items: center; }
   button { font-family: inherit; cursor: pointer; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 13px; box-shadow: var(--shadow); transition: background .15s, border-color .15s; }
   button:hover { border-color: var(--muted); }
   button.icon { width: 34px; height: 32px; padding: 0; display: grid; place-items: center; font-size: 15px; }
 
+  /* view toggle */
+  .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 2px; }
+  .seg button { border: none; box-shadow: none; background: transparent; color: var(--muted); border-radius: 7px; padding: 5px 14px; font-weight: 600; }
+  .seg button.on { background: var(--bg); color: var(--text); box-shadow: var(--shadow); }
+
+  .view { display: none; }
+  .view.on { display: block; }
+
+  /* year view */
   .hero { text-align: center; padding: 28px 0 8px; }
   .big { font-size: clamp(110px, 30vw, 280px); line-height: .95; font-weight: 800; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
   .label { margin-top: 6px; font-size: clamp(15px, 2.6vw, 22px); color: var(--muted); font-weight: 500; }
   .hms { margin-top: 14px; font-size: clamp(14px, 2.4vw, 20px); color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
   .hms b { color: var(--text); font-weight: 600; }
-
   .progress { margin: 22px auto 0; max-width: 520px; }
   .bar { height: 6px; border-radius: 99px; background: var(--track); overflow: hidden; }
   .bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .6s ease; }
-  .pct { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .pct { margin-top: 8px; font-size: 12px; color: var(--muted); text-align: center; }
 
-  .events { margin-top: 36px; }
-  .events h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); position: relative; }
-  .card .name { font-size: 14px; font-weight: 600; padding-right: 22px; word-break: break-word; }
-  .card .date { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .card .days { font-size: 44px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; line-height: 1; font-variant-numeric: tabular-nums; }
-  .card .unit { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .card.past .days { color: var(--muted); }
-  .del { position: absolute; top: 8px; right: 8px; border: none; background: transparent; box-shadow: none; color: var(--muted); padding: 2px 6px; font-size: 16px; line-height: 1; }
-  .del:hover { color: var(--text); }
-  .empty { font-size: 13px; color: var(--muted); padding: 18px; border: 1px dashed var(--border); border-radius: var(--radius); text-align: center; }
+  /* my events view */
+  .evhead { display: flex; justify-content: space-between; align-items: center; margin: 22px 0 12px; }
+  .evhead h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .evhead .count { text-transform: none; letter-spacing: 0; font-weight: 500; margin-left: 6px; }
 
-  #form { display: none; margin-top: 18px; gap: 8px; flex-wrap: wrap; }
+  #form { display: none; margin-bottom: 14px; gap: 8px; flex-wrap: wrap; }
   #form.open { display: flex; }
   input { font-family: inherit; font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; outline: none; }
   input:focus { border-color: var(--muted); }
@@ -72,36 +71,56 @@
   input[type="date"] { color-scheme: light; }
   :root[data-theme="dark"] input[type="date"] { color-scheme: dark; }
   #form button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 11px; box-shadow: var(--shadow); position: relative; min-width: 0; }
+  .card .name { font-size: 12px; font-weight: 600; padding-right: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .date { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .card .row { display: flex; align-items: baseline; gap: 5px; margin-top: 8px; }
+  .card .days { font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .card .unit { font-size: 10.5px; color: var(--muted); }
+  .card.past .days { color: var(--muted); }
+  .del { position: absolute; top: 4px; right: 4px; border: none; background: transparent; box-shadow: none; color: var(--muted); padding: 0 5px; font-size: 14px; line-height: 1.2; }
+  .del:hover { color: var(--text); }
+  .empty { font-size: 13px; color: var(--muted); padding: 18px; border: 1px dashed var(--border); border-radius: var(--radius); text-align: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="title" id="title">Countdown</div>
+    <div class="seg" role="tablist">
+      <button type="button" id="tabYear" class="on">Year</button>
+      <button type="button" id="tabEvents">My events</button>
+    </div>
     <div class="actions">
-      <button id="addBtn" type="button">+ Event</button>
       <button id="themeBtn" class="icon" type="button" aria-label="Toggle light and dark mode">☾</button>
     </div>
   </div>
 
-  <div id="form">
-    <input type="text" id="evName" placeholder="Event name (e.g. Birthday)" maxlength="40" autocomplete="off">
-    <input type="date" id="evDate">
-    <button class="primary" id="saveBtn" type="button">Add</button>
-  </div>
-
-  <div class="hero">
-    <div class="big" id="days">0</div>
-    <div class="label" id="label">days left</div>
-    <div class="hms" id="hms"></div>
-    <div class="progress">
-      <div class="bar"><i id="fill"></i></div>
-      <div class="pct" id="pct"></div>
+  <!-- YEAR VIEW -->
+  <div class="view on" id="viewYear">
+    <div class="hero">
+      <div class="big" id="days">0</div>
+      <div class="label" id="label">days left</div>
+      <div class="hms" id="hms"></div>
+      <div class="progress">
+        <div class="bar"><i id="fill"></i></div>
+        <div class="pct" id="pct"></div>
+      </div>
     </div>
   </div>
 
-  <div class="events">
-    <h2>Special events</h2>
+  <!-- MY EVENTS VIEW -->
+  <div class="view" id="viewEvents">
+    <div class="evhead">
+      <h2>My events<span class="count" id="evCount"></span></h2>
+      <button id="addBtn" type="button">+ Add event</button>
+    </div>
+    <div id="form">
+      <input type="text" id="evName" placeholder="Event name (e.g. Birthday)" maxlength="40" autocomplete="off">
+      <input type="date" id="evDate">
+      <button class="primary" id="saveBtn" type="button">Add</button>
+    </div>
     <div class="grid" id="grid"></div>
   </div>
 </div>
@@ -109,9 +128,8 @@
 <script>
 (function () {
   var root = document.documentElement;
-  var THEME_KEY = "yc-theme", EVENTS_KEY = "yc-events";
+  var THEME_KEY = "yc-theme", EVENTS_KEY = "yc-events", VIEW_KEY = "yc-view";
 
-  // ---------- storage helpers ----------
   function load(key, fallback) {
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
   }
@@ -133,6 +151,23 @@
     save(THEME_KEY, theme);
   });
 
+  // ---------- view toggle ----------
+  var tabYear = document.getElementById("tabYear"),
+      tabEvents = document.getElementById("tabEvents"),
+      viewYear = document.getElementById("viewYear"),
+      viewEvents = document.getElementById("viewEvents");
+  function setView(v) {
+    var isYear = v !== "events";
+    viewYear.classList.toggle("on", isYear);
+    viewEvents.classList.toggle("on", !isYear);
+    tabYear.classList.toggle("on", isYear);
+    tabEvents.classList.toggle("on", !isYear);
+    save(VIEW_KEY, isYear ? "year" : "events");
+  }
+  tabYear.addEventListener("click", function () { setView("year"); });
+  tabEvents.addEventListener("click", function () { setView("events"); });
+  setView(params.get("view") || load(VIEW_KEY, "year"));
+
   // ---------- date helpers ----------
   function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
   function parseLocal(str) { var p = str.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
@@ -144,8 +179,7 @@
       elLabel = document.getElementById("label"),
       elHms = document.getElementById("hms"),
       elFill = document.getElementById("fill"),
-      elPct = document.getElementById("pct"),
-      elTitle = document.getElementById("title");
+      elPct = document.getElementById("pct");
 
   function tickYear() {
     var now = new Date();
@@ -156,7 +190,6 @@
     var h = Math.floor(left / 3600000) % 24;
     var m = Math.floor(left / 60000) % 60;
     var s = Math.floor(left / 1000) % 60;
-    elTitle.textContent = y + " countdown";
     elDays.textContent = d;
     elLabel.textContent = (d === 1 ? "day" : "days") + " left in " + y;
     elHms.innerHTML = "<b>" + pad(h) + "</b>h &nbsp;<b>" + pad(m) + "</b>m &nbsp;<b>" + pad(s) + "</b>s";
@@ -168,13 +201,15 @@
   // ---------- events ----------
   var events = load(EVENTS_KEY, []);
   var grid = document.getElementById("grid");
+  var evCount = document.getElementById("evCount");
 
   function renderEvents() {
     grid.innerHTML = "";
+    evCount.textContent = events.length ? "· " + events.length : "";
     if (!events.length) {
       var e = document.createElement("div");
       e.className = "empty";
-      e.textContent = "No special events yet. Click “+ Event” to add one.";
+      e.textContent = "No events yet. Click “+ Add event” to create one.";
       grid.appendChild(e);
       return;
     }
@@ -183,15 +218,17 @@
       var diff = dayDiff(parseLocal(ev.date), today);
       var card = document.createElement("div");
       card.className = "card" + (diff < 0 ? " past" : "");
+      card.title = ev.name;
 
       var name = document.createElement("div"); name.className = "name"; name.textContent = ev.name;
       var date = document.createElement("div"); date.className = "date";
       date.textContent = parseLocal(ev.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+      var row = document.createElement("div"); row.className = "row";
       var days = document.createElement("div"); days.className = "days";
       var unit = document.createElement("div"); unit.className = "unit";
 
-      if (diff === 0) { days.textContent = "Today"; days.style.fontSize = "34px"; unit.textContent = "it's happening"; }
-      else if (diff > 0) { days.textContent = diff; unit.textContent = diff === 1 ? "day to go" : "days to go"; }
+      if (diff === 0) { days.textContent = "Today"; days.style.fontSize = "20px"; }
+      else if (diff > 0) { days.textContent = diff; unit.textContent = diff === 1 ? "day left" : "days left"; }
       else { days.textContent = Math.abs(diff); unit.textContent = Math.abs(diff) === 1 ? "day ago" : "days ago"; }
 
       var del = document.createElement("button");
@@ -201,18 +238,18 @@
         save(EVENTS_KEY, events); renderEvents();
       });
 
-      card.appendChild(del); card.appendChild(name); card.appendChild(date); card.appendChild(days); card.appendChild(unit);
+      row.appendChild(days); row.appendChild(unit);
+      card.appendChild(del); card.appendChild(name); card.appendChild(date); card.appendChild(row);
       grid.appendChild(card);
     });
   }
 
-  // ---------- form ----------
+  // ---------- add event ----------
   var form = document.getElementById("form"),
       addBtn = document.getElementById("addBtn"),
+      saveBtn = document.getElementById("saveBtn"),
       evName = document.getElementById("evName"),
       evDate = document.getElementById("evDate");
-
-  var saveBtn = document.getElementById("saveBtn");
 
   addBtn.addEventListener("click", function () {
     form.classList.toggle("open");
@@ -237,7 +274,7 @@
   // ---------- run ----------
   tickYear(); renderEvents();
   setInterval(tickYear, 1000);
-  setInterval(renderEvents, 60000); // refresh day counts (catches midnight rollover)
+  setInterval(renderEvents, 60000);
 })();
 </script>
 </body>
